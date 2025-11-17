@@ -1,0 +1,246 @@
+// Prisma schema for LocalBookr platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Users table - stores all user types (customers, partners, admins)
+model User {
+  id          String   @id @default(uuid())
+  name        String
+  phone       String   @unique
+  email       String?  @unique
+  role        UserRole @default(CUSTOMER)
+  is_verified Boolean  @default(false)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relations
+  owned_shops Shop[]
+  bookings    Booking[]
+  reviews     Review[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+// User roles enum
+enum UserRole {
+  CUSTOMER
+  PARTNER
+  ADMIN
+}
+
+// Cities table
+model City {
+  id        String   @id @default(uuid())
+  name      String
+  state     String
+  is_active Boolean  @default(true)
+  created_at DateTime @default(now())
+
+  // Relations
+  shops Shop[]
+
+  @@map("cities")
+}
+
+// Categories table
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  icon_url    String?
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+
+  // Relations
+  shops Service[]
+
+  @@map("categories")
+}
+
+// Shops table
+model Shop {
+  id             String     @id @default(uuid())
+  owner_id       String
+  name           String
+  description    String?
+  category_id    String
+  city_id        String
+  address        String
+  latitude       Decimal?   @db.Decimal(10, 8)
+  longitude      Decimal?   @db.Decimal(11, 8)
+  phone          String
+  email          String?
+  website        String?
+  opening_time   DateTime?  // Store as full date-time, extract time portion
+  closing_time   DateTime?  // Store as full date-time, extract time portion
+  off_days       String[]   // Array of day names: ["sunday", "monday"]
+  price_range    PriceRange?
+  photos         String[]   // Cloudinary URLs
+  rating         Decimal    @default(0) @db.Decimal(3, 2)
+  total_reviews  Int        @default(0)
+  is_verified    Boolean    @default(false)
+  is_active      Boolean    @default(true)
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+
+  // Relations
+  owner     User       @relation(fields: [owner_id], references: [id])
+  category  Category   @relation(fields: [category_id], references: [id])
+  city      City       @relation(fields: [city_id], references: [id])
+  services  Service[]
+  bookings  Booking[]
+  reviews   Review[]
+
+  @@map("shops")
+}
+
+// Price range enum
+enum PriceRange {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// Services table
+model Service {
+  id               String   @id @default(uuid())
+  shop_id          String
+  name             String
+  description      String?
+  duration_minutes Int
+  price            Decimal  @db.Decimal(10, 2)
+  is_active        Boolean  @default(true)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  // Relations
+  shop     Shop     @relation(fields: [shop_id], references: [id])
+  bookings Booking[]
+
+  @@map("services")
+}
+
+// Bookings table
+model Booking {
+  id              String        @id @default(uuid())
+  booking_number  String        @unique
+  customer_id     String
+  shop_id         String
+  service_id      String
+  date            DateTime      // Date without time
+  start_time      DateTime      // Full date-time for the start
+  end_time        DateTime      // Full date-time for the end
+  customer_name   String
+  customer_phone  String
+  customer_notes  String?
+  status          BookingStatus @default(PENDING)
+  cancel_reason   String?
+  total_amount    Decimal       @db.Decimal(10, 2)
+  reminder_sent   Boolean       @default(false)
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+
+  // Relations
+  customer User     @relation(fields: [customer_id], references: [id])
+  shop     Shop     @relation(fields: [shop_id], references: [id])
+  service  Service  @relation(fields: [service_id], references: [id])
+  reviews  Review[]
+  notifications Notification[]
+
+  @@map("bookings")
+}
+
+// Booking status enum
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+// Reviews table
+model Review {
+  id          String   @id @default(uuid())
+  booking_id  String   @unique
+  customer_id String
+  shop_id     String
+  rating      Int      // 1-5
+  comment     String?
+  is_visible  Boolean  @default(true)
+  created_at  DateTime @default(now())
+
+  // Relations
+  booking  Booking @relation(fields: [booking_id], references: [id])
+  customer User    @relation(fields: [customer_id], references: [id])
+  shop     Shop    @relation(fields: [shop_id], references: [id])
+
+  @@map("reviews")
+}
+
+// Notifications table
+model Notification {
+  id         String             @id @default(uuid())
+  booking_id String?
+  user_id    String
+  type       NotificationType
+  channel    NotificationChannel
+  recipient  String             // phone/email
+  message    String
+  status     NotificationStatus @default(PENDING)
+  provider   String?            // Twilio, MessageBird, etc.
+  error_message String?
+  sent_at    DateTime?
+  created_at DateTime           @default(now())
+
+  // Relations
+  booking Booking? @relation(fields: [booking_id], references: [id])
+  user    User     @relation(fields: [user_id], references: [id])
+
+  @@map("notifications")
+}
+
+// Notification type enum
+enum NotificationType {
+  BOOKING_CONFIRMATION
+  BOOKING_REMINDER
+  STATUS_UPDATE
+  NEW_BOOKING_ALERT
+  DAILY_SUMMARY
+}
+
+// Notification channel enum
+enum NotificationChannel {
+  WHATSAPP
+  SMS
+  EMAIL
+}
+
+// Notification status enum
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// OTP codes for authentication
+model OTPCode {
+  id         String   @id @default(uuid())
+  phone      String
+  code       String
+  expires_at DateTime
+  is_used    Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  @@unique([phone, is_used])
+  @@map("otp_codes")
+}
