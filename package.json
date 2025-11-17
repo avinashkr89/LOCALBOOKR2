@@ -1,0 +1,43 @@
+{
+  "name": "localbookr",
+  "version": "1.0.0",
+  "description": "Full-stack local service booking platform",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "partner-dashboard",
+    "admin-dashboard",
+    "shared"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:frontend && npm run install:partner && npm run install:admin && npm run install:shared",
+    "install:frontend": "cd frontend && npm install",
+    "install:partner": "cd partner-dashboard && npm install",
+    "install:admin": "cd admin-dashboard && npm install",
+    "install:shared": "cd shared && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:partner\" \"npm run dev:admin\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:partner": "cd partner-dashboard && npm run dev",
+    "dev:admin": "cd admin-dashboard && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend && npm run build:partner && npm run build:admin",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "setup": "./scripts/setup.sh",
+    "seed": "cd backend && npm run seed",
+    "migrate": "cd backend && npx prisma migrate dev",
+    "deploy": "./scripts/deploy.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
