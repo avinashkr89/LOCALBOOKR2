@@ -1,19 +1,89 @@
+# ========== CONFIGURATION FOR MULTI-APP DEPLOYMENT ==========
+
 [build]
-  # Directory to deploy
-  publish = "frontend/dist/"
-  command = "cd frontend && npm run build"
+  # This is a monorepo - build all applications
+  command = "npm run build:all"
+  publish = "dist/"
 
 [build.environment]
   NODE_VERSION = "18"
+  NEXT_TELEMETRY_DISABLED = "1"
 
+# ========== CUSTOMER APP DEPLOYMENT ==========
+[build.customer]
+  command = "cd frontend && npm run build"
+  publish = "frontend/.next"
+
+# ========== ADMIN APP DEPLOYMENT ==========
+[build.admin]
+  command = "cd admin-dashboard && npm run build"
+  publish = "admin-dashboard/.next"
+
+# ========== PARTNER APP DEPLOYMENT ==========
+[build.partner]
+  command = "cd partner-dashboard && npm run build"
+  publish = "partner-dashboard/.next"
+
+# ========== ENVIRONMENT VARIABLES ==========
 [build.environment]
-  # Production environment variables (set in Netlify dashboard)
-  NEXT_PUBLIC_API_URL = "https://your-backend-url.com/api/v1"
+  # Production environment (set in Netlify dashboard)
+  NEXT_PUBLIC_API_URL = "https://localbookr.netlify.app/.netlify/functions"
   NEXT_PUBLIC_APP_NAME = "LocalBookr"
   NEXT_PUBLIC_ENVIRONMENT = "production"
+  NEXT_PUBLIC_SUPABASE_URL = "https://your-project.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "your-anon-key"
 
-# Redirects for better URLs
+# ========== SECURITY HEADERS ==========
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Permissions-Policy = "interest-camera=(), microphone=(), geolocation=()"
+
+# ========== NETLIFY FUNCTIONS ==========
+[functions]
+  # Node.js version for functions
+  node_version = "18"
+
+  # Directory with serverless functions
+  directory = "netlify/functions"
+
+# ========== API ROUTES (REWRITES) ==========
 [[redirects]]
+  # Route all API calls to Netlify Functions
+  from = "/api/v1/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# ========== MULTIPLE APP ROUTING ==========
+# Option 1: Single domain with path-based routing
+# Uncomment this section for single-domain deployment:
+
+# [[redirects]]
+#   from = "/customer/*"
+#   to = "/.netlify/functions/customer-router/:splat"
+#   status = 200
+#
+# [[redirects]]
+#   from = "/admin/*"
+#   to = "/.netlify/functions/admin-router/:splat"
+#   status = 200
+#
+# [[redirects]]
+#   from = "/partner/*"
+#   to = "/.netlify/functions/partner-router/:splat"
+#   status = 200
+
+# Option 2: Multiple domains (recommended)
+# Comment the above and use separate deployments for each app
+
+# ========== SEO & PERFORMANCE ==========
+[[redirects]]
+  # Clean URL redirects
   from = "/home"
   to = "/"
   status = 301
@@ -22,35 +92,9 @@
   to = "/auth/login"
   status = 301
 
-# API rewrites to backend
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-# Headers for security
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-
-# Partner Dashboard
-[[redirects]]
-  from = "/partner/*"
-  to = "https://partner-localbookr.netlify.app/:splat"
-  status = 301
-
-# Admin Dashboard
-[[redirects]]
-  from = "/admin/*"
-  to = "https://admin-localbookr.netlify.app/:splat"
-  status = 301
-
-# SPA fallback
+# ========== SPA SUPPORT ==========
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  query = {path} # This preserves the path
