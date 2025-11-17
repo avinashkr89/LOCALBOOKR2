@@ -1,0 +1,56 @@
+[build]
+  # Directory to deploy
+  publish = "frontend/dist/"
+  command = "cd frontend && npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[build.environment]
+  # Production environment variables (set in Netlify dashboard)
+  NEXT_PUBLIC_API_URL = "https://your-backend-url.com/api/v1"
+  NEXT_PUBLIC_APP_NAME = "LocalBookr"
+  NEXT_PUBLIC_ENVIRONMENT = "production"
+
+# Redirects for better URLs
+[[redirects]]
+  from = "/home"
+  to = "/"
+  status = 301
+
+  from = "/login"
+  to = "/auth/login"
+  status = 301
+
+# API rewrites to backend
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Partner Dashboard
+[[redirects]]
+  from = "/partner/*"
+  to = "https://partner-localbookr.netlify.app/:splat"
+  status = 301
+
+# Admin Dashboard
+[[redirects]]
+  from = "/admin/*"
+  to = "https://admin-localbookr.netlify.app/:splat"
+  status = 301
+
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
