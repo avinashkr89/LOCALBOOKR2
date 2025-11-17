@@ -1,0 +1,23 @@
+{
+  "name": "localbookr-shared",
+  "version": "1.0.0",
+  "description": "LocalBookr shared types and utilities",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
+  },
+  "dependencies": {
+    "zod": "^3.22.4",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "eslint": "^8.54.0",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0"
+  }
+}
