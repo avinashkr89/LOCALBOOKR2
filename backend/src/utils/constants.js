@@ -1,0 +1,186 @@
+/**
+ * Application Constants
+ */
+
+// User Roles
+const USER_ROLES = {
+  CUSTOMER: 'CUSTOMER',
+  PARTNER: 'PARTNER',
+  ADMIN: 'ADMIN'
+};
+
+// Booking Status
+const BOOKING_STATUS = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  CANCELLED: 'CANCELLED',
+  COMPLETED: 'COMPLETED',
+  NO_SHOW: 'NO_SHOW'
+};
+
+// Price Range
+const PRICE_RANGE = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH'
+};
+
+// Notification Types
+const NOTIFICATION_TYPES = {
+  BOOKING_CONFIRMATION: 'BOOKING_CONFIRMATION',
+  BOOKING_REMINDER: 'BOOKING_REMINDER',
+  STATUS_UPDATE: 'STATUS_UPDATE',
+  NEW_BOOKING_ALERT: 'NEW_BOOKING_ALERT',
+  DAILY_SUMMARY: 'DAILY_SUMMARY'
+};
+
+// Notification Channels
+const NOTIFICATION_CHANNELS = {
+  WHATSAPP: 'WHATSAPP',
+  SMS: 'SMS',
+  EMAIL: 'EMAIL'
+};
+
+// Notification Status
+const NOTIFICATION_STATUS = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+};
+
+// HTTP Status Codes
+const HTTP_STATUS = {
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  INTERNAL_SERVER_ERROR: 500,
+  SERVICE_UNAVAILABLE: 503
+};
+
+// Error Codes
+const ERROR_CODES = {
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  NOT_FOUND: 'NOT_FOUND',
+  CONFLICT: 'CONFLICT',
+  RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+  BOOKING_CONFLICT: 'BOOKING_CONFLICT',
+  INVALID_TOKEN: 'INVALID_TOKEN',
+  TOKEN_EXPIRED: 'TOKEN_EXPIRED',
+  ACCOUNT_INACTIVE: 'ACCOUNT_INACTIVE',
+  PERMISSION_DENIED: 'PERMISSION_DENIED'
+};
+
+// Booking Time Slots
+const TIME_SLOTS = [
+  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+  '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
+  '18:00', '18:30', '19:00', '19:30', '20:00'
+];
+
+// Days of Week
+const DAYS_OF_WEEK = [
+  'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'
+];
+
+// Default Pagination
+const PAGINATION = {
+  DEFAULT_PAGE: 1,
+  DEFAULT_LIMIT: 20,
+  MAX_LIMIT: 100
+};
+
+// OTP Configuration
+const OTP_CONFIG = {
+  LENGTH: 6,
+  EXPIRY_MINUTES: 10,
+  MAX_ATTEMPTS: 3
+};
+
+// JWT Configuration
+const JWT_CONFIG = {
+  EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
+  REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '30d'
+};
+
+// Rate Limits
+const RATE_LIMITS = {
+  GENERAL: {
+    WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+    MAX_REQUESTS: 100
+  },
+  AUTH: {
+    WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+    MAX_REQUESTS: 5
+  },
+  BOOKING: {
+    WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+    MAX_REQUESTS: 20
+  },
+  OTP: {
+    WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+    MAX_REQUESTS: 3
+  }
+};
+
+// WhatsApp Templates
+const WHATSAPP_TEMPLATES = {
+  BOOKING_CONFIRMATION: 'booking_confirmation',
+  BOOKING_REMINDER: 'booking_reminder',
+  BOOKING_CANCELLED: 'booking_cancelled',
+  NEW_BOOKING_ALERT: 'new_booking_alert',
+  DAILY_SUMMARY: 'daily_summary'
+};
+
+// File Upload Limits
+const UPLOAD_LIMITS = {
+  MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
+  ALLOWED_FILE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+  MAX_FILES_PER_UPLOAD: 5
+};
+
+// Business Rules
+const BUSINESS_RULES = {
+  MAX_BOOKING_ADVANCE_DAYS: 90,
+  CANCELLATION_POLICY_HOURS: 24,
+  AUTOMATIC_REMINDER_HOURS: 2,
+  MINIMUM_BOOKING_AMOUNT: 50,
+  PLATFORM_COMMISSION_RATE: 10
+};
+
+// Database Query Limits
+const QUERY_LIMITS = {
+  MAX_RESULTS_PER_QUERY: 1000,
+  DEFAULT_PAGE_SIZE: 20
+};
+
+module.exports = {
+  USER_ROLES,
+  BOOKING_STATUS,
+  PRICE_RANGE,
+  NOTIFICATION_TYPES,
+  NOTIFICATION_CHANNELS,
+  NOTIFICATION_STATUS,
+  HTTP_STATUS,
+  ERROR_CODES,
+  TIME_SLOTS,
+  DAYS_OF_WEEK,
+  PAGINATION,
+  OTP_CONFIG,
+  JWT_CONFIG,
+  RATE_LIMITS,
+  WHATSAPP_TEMPLATES,
+  UPLOAD_LIMITS,
+  BUSINESS_RULES,
+  QUERY_LIMITS
+};
