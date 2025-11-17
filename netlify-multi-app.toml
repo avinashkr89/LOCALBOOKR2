@@ -1,0 +1,142 @@
+# ========== LOCALBOOKR MULTI-APP DEPLOYMENT ==========
+# Complete LocalBookr Platform Deployment
+
+[build]
+  command = "npm run build:all"
+  publish = "dist/"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# ========== CUSTOMER APP DEPLOYMENT ==========
+[build.customer]
+  command = "cd frontend && npm run build"
+  publish = "customer/.next"
+
+[build.environment.customer]
+  NEXT_PUBLIC_API_URL = "https://api-localbookr.netlify.app/.netlify/functions"
+  NEXT_PUBLIC_APP_NAME = "LocalBookr"
+  NEXT_PUBLIC_ENVIRONMENT = "production"
+  NEXT_PUBLIC_SUPABASE_URL = "https://your-project.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "your-anon-key"
+
+# ========== ADMIN APP DEPLOYMENT ==========
+[build.admin]
+  command = "cd admin-dashboard && npm run build"
+  publish = "admin/.next"
+
+[build.environment.admin]
+  NEXT_PUBLIC_API_URL = "https://api-localbookr.netlify.app/.netlify/functions"
+  NEXT_PUBLIC_APP_NAME = "LocalBookr Admin"
+  NEXT_PUBLIC_ENVIRONMENT = "production"
+  NEXT_PUBLIC_SUPABASE_URL = "https://your-project.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "your-anon-key"
+
+# ========== PARTNER APP DEPLOYMENT ==========
+[build.partner]
+  command = "cd partner-dashboard && npm run build"
+  publish = "partner/.next"
+
+[build.environment.partner]
+  NEXT_PUBLIC_API_URL = "https://api-localbookr.netlify.app/.netlify/functions"
+  NEXT_PUBLIC_APP_NAME = "LocalBookr Partner"
+  NEXT_PUBLIC_ENVIRONMENT = "production"
+  NEXT_PUBLIC_SUPABASE_URL = "https://your-project.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "your-anon-key"
+
+# ========== DEPLOYMENT TARGETS ==========
+[context.production]
+  command = "npm run deploy:netlify"
+
+[context.deploy.production]
+  [context.deploy.environment]
+  NETLIFY_AUTH_TOKEN = "your-netlify-auth-token"
+  NETLIFY_SITE_ID_CUSTOMER = "your-site-id-customer"
+  NETLIFY_SITE_ID_ADMIN = "your-site-id-admin"
+  NETLIFY_SITE_ID_PARTNER = "your-site-id-partner"
+  NETLIFY_SITE_ID_API = "your-site-id-api"
+
+# ========== FUNCTIONS CONFIGURATION ==========
+[functions]
+  node_version = "18"
+  directory = "netlify/functions"
+
+# ========== ENVIRONMENT VARIABLES ==========
+[build.environment]
+  # Production environment variables
+  NEXT_PUBLIC_API_URL = "https://api-localbookr.netlify.app/.netlify/functions"
+  NEXT_PUBLIC_SUPABASE_URL = "https://your-project.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "your-anon-key"
+
+  # Database (Supabase)
+  DATABASE_URL = "postgresql://postgres.your-project:[password]@aws.your-aws-region.rds.amazonaws.com:5432/localbookr"
+  SUPABASE_SERVICE_ROLE_KEY = "your-service-role-key"
+
+  # Authentication
+  JWT_SECRET = "your-super-secure-jwt-secret-change-this"
+
+  # WhatsApp/Twilio
+  TWILIO_ACCOUNT_SID = "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  TWILIO_AUTH_TOKEN = "your-twilio-auth-token"
+  TWILIO_WHATSAPP_NUMBER = "whatsapp:+14155238886"
+
+  # File Storage (Cloudinary)
+  CLOUDINARY_CLOUD_NAME = "your-cloudinary-name"
+  CLOUDINARY_API_KEY = "your-cloudinary-api-key"
+  CLOUDINARY_API_SECRET = "your-cloudinary-api-secret"
+
+  # Rate Limiting
+  API_RATE_LIMIT_ENABLED = "true"
+  NOTIFICATION_RATE_LIMIT_ENABLED = "true"
+
+  # Platform Settings
+  PLATFORM_COMMISSION_RATE = "10"
+  MINIMUM_BOOKING_AMOUNT = "50"
+  MAXIMUM_BOOKING_ADVANCE_DAYS = "90"
+  CANCELLATION_POLICY_HOURS = "24"
+  AUTOMATIC_REMINDER_HOURS = "2"
+
+# ========== SECURITY HEADERS ==========
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Permissions-Policy = "interest-camera=(), microphone=(), geolocation=()"
+
+# ========== API REWRITES ==========
+[[redirects]]
+  # Route all API calls to Netlify Functions
+  from = "/api/v1/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# ========== SITE CONFIGURATIONS ==========
+# Customer App
+[[redirects]]
+  from = "/customer/*"
+  to = "https://localbookr-customer.netlify.app"
+  status = 301
+
+# Admin App
+[[redirects]]
+  from = "/admin/*"
+  to = "https://localbookr-admin.netlify.app"
+  status = 301
+
+# Partner App
+[[redirects]]
+  from = "/partner/*"
+  to = "https://localbookr-partner.netlify.app"
+  status = 301
+
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  query = {path}
